@@ -14,5 +14,29 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect(route('login'));
+});
+Route::get('/stats', function () {
+    return view('dashboard/gestionnaires/stats_view');
+});
+//----------------------------------------------------------
+Route::controller(App\Http\Controllers\AdminController::class)->group(function(){
+    Route::get('/login/index', 'loginindex')->name('login');
+    Route::post('/login', 'login');
+    Route::post('/logout', 'logout')->name('logout')->middleware('auth.admins');
+    Route::get('/dashboard', 'dashboard')->name('dashboard')->middleware('auth.globals');
+});
+
+Route::controller(App\Http\Controllers\HotelController::class)->group(function(){
+    Route::get('/hotels', 'index')->middleware('auth.admins')->name('allhotels');
+    Route::get('/hotel/{id}', 'getHotelById')->middleware('auth.admins')->name('hotel');
+    Route::get('/hotels/add/index', 'addindex');
+    Route::post('/registerhotel', 'register');
+});
+
+Route::controller(App\Http\Controllers\GestionnaireController::class)->group(function($id = null){
+    Route::get('/gestionnaires/{id?}', 'index')->middleware('auth.admins');
+    Route::get('/gestionnaire/add', 'registerindex');
+    Route::post('/registergestionnaire', 'register');
+    Route::post('/gestionnaire/logout', 'logout');
 });
